@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Asan Tiffin</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --saffron:#FF6B00;--turmeric:#FFA500;--cream:#FFF8F0;
+  --leaf:#2D6A4F;--mint:#52B788;--dark:#1A1A2E;
+  --red:#E74C3C;--green:#27AE60;--gold:#F39C12;--blue:#2980B9;
+  --wa:#25D366;--card:0 4px 16px rgba(0,0,0,.08)
+}
+body{font-family:'Poppins',sans-serif;background:#F5F5F5;color:var(--dark);min-height:100vh;padding-bottom:70px}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;border-top:1px solid #EEE;z-index:200;box-shadow:0 -2px 8px rgba(0,0,0,.08)}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;cursor:pointer;border:none;background:none;font-family:'Poppins',sans-serif}
+.bn-ic{font-size:22px;line-height:1}
+.bn-lb{font-size:9px;color:#aaa;font-weight:600;margin-top:2px}
+.bn-item.active .bn-lb{color:var(--saffron)}
+.bn-item.active .bn-ic{filter:drop-shadow(0 0 4px var(--saffron))}
+
+/* TOPBAR */
+.topbar{background:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #EEE;position:sticky;top:0;z-index:99;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.tb-title{font-family:'Baloo 2',sans-serif;font-size:20px;font-weight:800}
+.tb-date{font-size:11px;color:#888}
+.tb-btn{background:linear-gradient(135deg,var(--saffron),var(--turmeric));color:#fff;border:none;border-radius:10px;padding:9px 16px;font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;cursor:pointer}
+
+/* PAGES */
+.page{display:none;padding:14px}
+.page.active{display:block}
+
+/* CARDS */
+.card{background:#fff;border-radius:14px;padding:16px;box-shadow:var(--card);margin-bottom:14px}
+.card-title{font-family:'Baloo 2',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:#fff;border-radius:14px;padding:14px;box-shadow:var(--card);text-align:center}
+.stat-val{font-family:'Baloo 2',sans-serif;font-size:26px;font-weight:800;margin:4px 0}
+.stat-lbl{font-size:11px;color:#888;font-weight:500}
+
+/* BANNER */
+.banner{background:linear-gradient(135deg,var(--saffron),var(--turmeric));border-radius:14px;padding:18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.banner-title{font-family:'Baloo 2',sans-serif;font-size:22px;font-weight:800;color:#fff}
+.banner-sub{color:rgba(255,255,255,.85);font-size:12px;margin-top:3px}
+.banner-badge{background:rgba(255,255,255,.25);border-radius:10px;padding:8px 14px;font-family:'Baloo 2',sans-serif;font-size:15px;font-weight:700;color:#fff}
+
+/* QUICK ACTIONS */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qa-btn{border:none;border-radius:12px;padding:16px 10px;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;text-align:center;transition:transform .1s}
+.qa-btn:active{transform:scale(.97)}
+.qa-btn .ic{font-size:26px;display:block;margin-bottom:6px}
+
+/* PILLS */
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.p-green{background:#E8F8EE;color:var(--green)}
+.p-yellow{background:#FFF3CD;color:var(--gold)}
+.p-red{background:#FDEDEC;color:var(--red)}
+.p-blue{background:#E8F4FD;color:var(--blue)}
+.p-orange{background:#FFF0E6;color:var(--saffron)}
+.p-gray{background:#F0F0F0;color:#666}
+
+/* BUTTONS */
+.btn{padding:9px 14px;border-radius:10px;border:none;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:linear-gradient(135deg,var(--saffron),var(--turmeric));color:#fff}
+.btn-secondary{background:#F0F0F0;color:var(--dark)}
+.btn-danger{background:#FDEDEC;color:var(--red)}
+.btn-success{background:#E8F8EE;color:var(--green)}
+.btn-wa{background:var(--wa);color:#fff}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:8px}
+.btn-full{width:100%;justify-content:center;padding:13px}
+
+/* FORMS */
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:600;color:var(--dark);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:12px 14px;border:2px solid #EEE;border-radius:10px;font-family:'Poppins',sans-serif;font-size:13px;color:var(--dark);background:#FAFAFA;outline:none;transition:border .2s}
+.form-input:focus{border-color:var(--saffron);background:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:22px 22px 0 0;padding:20px 18px;width:100%;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;position:sticky;top:0;background:#fff;padding-bottom:12px;border-bottom:2px solid #F0F0F0;z-index:10}
+.modal-title{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:800}
+.modal-close{width:32px;height:32px;border-radius:8px;background:#F0F0F0;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-footer{position:sticky;bottom:0;background:#fff;padding-top:14px;border-top:1px solid #F0F0F0;margin-top:16px;display:flex;gap:10px}
+
+/* SUBSCRIPTION PLAN */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.plan-opt{border:2px solid #EEE;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s}
+.plan-opt.selected{border-color:var(--saffron);background:#FFF0E6}
+.plan-opt .plan-price{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:800;color:var(--saffron)}
+.plan-opt .plan-lbl{font-size:10px;color:#888;font-weight:600;margin-top:2px}
+
+/* CUSTOMER CARD */
+.cust-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:var(--card)}
+.cust-av{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--saffron),var(--turmeric));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0}
+
+/* ORDER CARD */
+.order-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:var(--card)}
+
+/* SEARCH */
+.search-box{width:100%;padding:11px 14px 11px 38px;border:2px solid #EEE;border-radius:12px;font-family:'Poppins',sans-serif;font-size:13px;outline:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center;margin-bottom:14px}
+.search-box:focus{border-color:var(--saffron);outline:none}
+
+.empty{text-align:center;padding:40px 20px;color:#aaa;font-size:13px}
+.empty .ei{font-size:42px;margin-bottom:10px}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:14px;right:14px;background:var(--dark);color:#fff;padding:13px 18px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;text-align:center;transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* SECTION HEADER */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800}
+
+/* STATUS TRACKER */
+.tracker{display:flex;align-items:center;margin:10px 0}
+.t-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.t-step::after{content:'';position:absolute;top:14px;left:55%;right:-45%;height:2px;background:#EEE;z-index:0}
+.t-step:last-child::after{display:none}
+.t-step.done::after{background:var(--green)}
+.t-circle{width:28px;height:28px;border-radius:50%;background:#EEE;border:2px solid #DDD;display:flex;align-items:center;justify-content:center;font-size:10px;position:relative;z-index:1}
+.t-step.done .t-circle{background:var(--green);border-color:var(--green);color:#fff}
+.t-step.current .t-circle{background:var(--saffron);border-color:var(--saffron);color:#fff}
+.t-lbl{font-size:9px;color:#aaa;font-weight:600;margin-top:4px;text-align:center}
+.t-step.done .t-lbl,.t-step.current .t-lbl{color:var(--dark)}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div>
+    <div class="tb-title" id="pg-title">🍱 Asan Tiffin</div>
+    <div class="tb-date" id="pg-date"></div>
+  </div>
+  <button class="tb-btn" id="top-btn" onclick="topAction()">➕ New Order</button>
+</div>
+
+<!-- PAGES -->
+<div class="page active" id="page-dash"></div>
+<div class="page" id="page-customers"></div>
+<div class="page" id="page-orders"></div>
+<div class="page" id="page-kitchen"></div>
+<div class="page" id="page-reports"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="bn-item active" id="nav-dash" onclick="showPage('dash')">
+    <span class="bn-ic">🏠</span>
+    <span class="bn-lb">Dashboard</span>
+  </button>
+  <button class="bn-item" id="nav-customers" onclick="showPage('customers')">
+    <span class="bn-ic">👥</span>
+    <span class="bn-lb">Customers</span>
+  </button>
+  <button class="bn-item" id="nav-orders" onclick="showPage('orders')">
+    <span class="bn-ic">📦</span>
+    <span class="bn-lb">Orders</span>
+  </button>
+  <button class="bn-item" id="nav-kitchen" onclick="showPage('kitchen')">
+    <span class="bn-ic">👨‍🍳</span>
+    <span class="bn-lb">Kitchen</span>
+  </button>
+  <button class="bn-item" id="nav-reports" onclick="showPage('reports')">
+    <span class="bn-ic">📊</span>
+    <span class="bn-lb">Reports</span>
+  </button>
+</nav>
+
+<!-- ADD CUSTOMER MODAL -->
+<div class="modal-overlay" id="modal-customer">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">👤 Customer Add Karein</div>
+      <button class="modal-close" onclick="closeModal('modal-customer')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Naam *</label>
+      <input class="form-input" id="c-name" placeholder="Customer ka naam">
+    </div>
+    <div class="form-group"><label class="form-label">Phone *</label>
+      <input class="form-input" id="c-phone" type="tel" placeholder="Mobile number">
+    </div>
+    <div class="form-group"><label class="form-label">Address</label>
+      <input class="form-input" id="c-addr" placeholder="Delivery address">
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tiffin Type</label>
+        <select class="form-input" id="c-type">
+          <option value="Veg">🌿 Veg</option>
+          <option value="Non-Veg">🍗 Non-Veg</option>
+          <option value="Both">🍽️ Both</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Start Date</label>
+        <input class="form-input" id="c-start" type="date">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">💳 Subscription Plan</label>
+      <div class="plan-grid">
+        <div class="plan-opt" id="plan-2500" onclick="selectPlan(2500)">
+          <div class="plan-price">₹2500</div>
+          <div class="plan-lbl">Per Month</div>
+        </div>
+        <div class="plan-opt" id="plan-2000" onclick="selectPlan(2000)">
+          <div class="plan-price">₹2000</div>
+          <div class="plan-lbl">Per Month</div>
+        </div>
+        <div class="plan-opt" id="plan-1500" onclick="selectPlan(1500)">
+          <div class="plan-price">₹1500</div>
+          <div class="plan-lbl">Per Month</div>
+        </div>
+        <div class="plan-opt" id="plan-custom" onclick="selectPlan('custom')">
+          <div class="plan-price">✏️</div>
+          <div class="plan-lbl">Custom</div>
+        </div>
+      </div>
+      <input class="form-input" id="c-custom-amt" type="number" placeholder="Custom amount..." style="display:none;margin-top:8px">
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" style="flex:1;justify-content:center" onclick="closeModal('modal-customer')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="addCustomer()">✅ Save Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ORDER MODAL -->
+<div class="modal-overlay" id="modal-order">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">➕ New Order</div>
+      <button class="modal-close" onclick="closeModal('modal-order')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Customer *</label>
+      <select class="form-input" id="o-cust">
+        <option value="">-- Customer select karein --</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Type</label>
+        <select class="form-input" id="o-type">
+          <option value="Veg">🌿 Veg</option>
+          <option value="Non-Veg">🍗 Non-Veg</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Qty</label>
+        <input class="form-input" id="o-qty" type="number" value="1" min="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Amount ₹</label>
+        <input class="form-input" id="o-amt" type="number" placeholder="Amount">
+      </div>
+      <div class="form-group"><label class="form-label">Date</label>
+        <input class="form-input" id="o-date" type="date">
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Note</label>
+      <input class="form-input" id="o-note" placeholder="Special instructions...">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" style="flex:1;justify-content:center" onclick="closeModal('modal-order')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="addOrder()">✅ Save Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PAYMENT MODAL -->
+<div class="modal-overlay" id="modal-payment">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">💵 Payment Add Karein</div>
+      <button class="modal-close" onclick="closeModal('modal-payment')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Customer *</label>
+      <select class="form-input" id="p-cust">
+        <option value="">-- Customer select karein --</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Amount ₹ *</label>
+        <input class="form-input" id="p-amt" type="number" placeholder="Amount">
+      </div>
+      <div class="form-group"><label class="form-label">Date</label>
+        <input class="form-input" id="p-date" type="date">
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Payment Mode</label>
+      <select class="form-input" id="p-mode">
+        <option value="Cash">💵 Cash</option>
+        <option value="UPI">📱 UPI</option>
+        <option value="Online">🌐 Online</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" style="flex:1;justify-content:center" onclick="closeModal('modal-payment')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="addPayment()">✅ Save Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD EXPENSE MODAL -->
+<div class="modal-overlay" id="modal-expense">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📤 Expense Add Karein</div>
+      <button class="modal-close" onclick="closeModal('modal-expense')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Type</label>
+      <select class="form-input" id="exp-type">
+        <option value="Raw Material">🥦 Raw Material</option>
+        <option value="Gas/Fuel">🔥 Gas / Fuel</option>
+        <option value="Packaging">📦 Packaging</option>
+        <option value="Delivery">🛵 Delivery</option>
+        <option value="Labour">👷 Labour</option>
+        <option value="Other">📝 Other</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Amount ₹</label>
+        <input class="form-input" id="exp-amt" type="number" placeholder="Amount">
+      </div>
+      <div class="form-group"><label class="form-label">Date</label>
+        <input class="form-input" id="exp-date" type="date">
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Note</label>
+      <input class="form-input" id="exp-note" placeholder="Details...">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" style="flex:1;justify-content:center" onclick="closeModal('modal-expense')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="addExpense()">✅ Save Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATABASE =====
+let DB = { customers:[], orders:[], payments:[], expenses:[] };
+let selectedPlan = null;
+
+function loadDB(){
+  try{ const s=localStorage.getItem('asanTiffin'); if(s) DB=JSON.parse(s); }catch(e){}
+}
+function saveDB(){ localStorage.setItem('asanTiffin', JSON.stringify(DB)); }
+loadDB();
+
+// ===== UTILS =====
+function today(){ return new Date().toISOString().split('T')[0]; }
+function fmtDate(d){ return d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : ''; }
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function calcDue(custId){
+  const ord=DB.orders.filter(o=>o.custId===custId&&o.status!=='Cancelled').reduce((s,o)=>s+o.amount,0);
+  const paid=DB.payments.filter(p=>p.custId===custId).reduce((s,p)=>s+p.amount,0);
+  return Math.max(0,ord-paid);
+}
+
+// ===== NAVIGATION =====
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  const page=document.getElementById('page-'+name);
+  const nav=document.getElementById('nav-'+name);
+  if(page) page.classList.add('active');
+  if(nav) nav.classList.add('active');
+
+  const titles={dash:'🍱 Asan Tiffin',customers:'👥 Customers',orders:'📦 Orders',kitchen:'👨‍🍳 Kitchen',reports:'📊 Reports'};
+  document.getElementById('pg-title').textContent=titles[name]||'🍱 Asan Tiffin';
+
+  const btn=document.getElementById('top-btn');
+  if(name==='customers'){ btn.textContent='➕ Add Customer'; btn.style.display=''; }
+  else if(name==='reports'){ btn.style.display='none'; }
+  else if(name==='kitchen'){ btn.textContent='➕ New Order'; btn.style.display=''; }
+  else{ btn.textContent='➕ New Order'; btn.style.display=''; }
+
+  if(name==='dash') renderDash();
+  if(name==='customers') renderCustomers();
+  if(name==='orders') renderOrders();
+  if(name==='kitchen') renderKitchen();
+  if(name==='reports') renderReports();
+}
+
+function topAction(){
+  const active=document.querySelector('.page.active');
+  if(active&&active.id==='page-customers') openModal('modal-customer');
+  else openModal('modal-order');
+}
+
+// ===== MODALS =====
+function openModal(id){
+  if(id==='modal-order'||id==='modal-payment'){
+    const sid=id==='modal-order'?'o-cust':'p-cust';
+    const sel=document.getElementById(sid);
+    sel.innerHTML='<option value="">-- Customer select karein --</option>';
+    DB.customers.forEach(c=>{ sel.innerHTML+=`<option value="${c.id}">${c.name} - ${c.phone}</option>`; });
+    const df=document.getElementById(id==='modal-order'?'o-date':'p-date');
+    if(df) df.value=today();
+  }
+  if(id==='modal-expense') document.getElementById('exp-date').value=today();
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
+});
+
+// ===== SUBSCRIPTION PLAN =====
+function selectPlan(val){
+  selectedPlan=val;
+  document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('plan-'+val).classList.add('selected');
+  const ci=document.getElementById('c-custom-amt');
+  ci.style.display=val==='custom'?'block':'none';
+  if(val==='custom') ci.focus();
+}
+
+// ===== CUSTOMERS =====
+function addCustomer(){
+  const name=document.getElementById('c-name').value.trim();
+  const phone=document.getElementById('c-phone').value.trim();
+  if(!name||!phone){ showToast('⚠️ Naam aur phone zaroor dalein!'); return; }
+  let plan=null;
+  if(selectedPlan==='custom') plan=parseInt(document.getElementById('c-custom-amt').value)||null;
+  else if(selectedPlan) plan=selectedPlan;
+
+  DB.customers.push({
+    id:Date.now(), name, phone,
+    address:document.getElementById('c-addr').value.trim(),
+    type:document.getElementById('c-type').value,
+    startDate:document.getElementById('c-start').value,
+    plan, active:true
+  });
+  saveDB();
+  closeModal('modal-customer');
+  // Reset form
+  ['c-name','c-addr','c-phone','c-custom-amt'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('c-start').value=today();
+  selectedPlan=null;
+  document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('c-custom-amt').style.display='none';
+  showToast('✅ Customer add ho gaya!');
+  renderCustomers();
+  renderDash();
+}
+
+function renderCustomers(search=''){
+  const el=document.getElementById('page-customers');
+  let custs=DB.customers.filter(c=>
+    c.name.toLowerCase().includes(search.toLowerCase())||c.phone.includes(search)
+  );
+  el.innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn btn-primary btn-full" onclick="openModal('modal-customer')">➕ Add Customer</button>
+    </div>
+    <input class="search-box" type="text" placeholder="🔍 Customer search karein..." oninput="renderCustomers(this.value)" value="${search}">
+    ${!custs.length?'<div class="empty"><div class="ei">👥</div>Koi customer nahi<br><small>Upar button se add karein</small></div>':
+    custs.map(c=>{
+      const due=calcDue(c.id);
+      return `<div class="cust-card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div class="cust-av">${c.name[0].toUpperCase()}</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:15px">${c.name}</div>
+            <div style="font-size:12px;color:#888">📞 ${c.phone}</div>
+            ${c.plan?`<div style="font-size:12px;color:var(--saffron);font-weight:700">💳 ₹${c.plan}/month</div>`:''}
+          </div>
+          <span class="pill ${c.type==='Veg'?'p-green':'p-red'}">${c.type}</span>
+        </div>
+        ${c.address?`<div style="font-size:12px;color:#888;margin-bottom:8px">📍 ${c.address}</div>`:''}
+        ${due>0?`<div style="background:#FDEDEC;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--red)">⏳ Payment Due: ₹${due}</div>`:''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="openOrderFor(${c.id})">➕ Order</button>
+          <button class="btn btn-success btn-sm" onclick="openPaymentFor(${c.id})">💵 Payment</button>
+          <a class="btn btn-wa btn-sm" href="tel:${c.phone}">📞 Call</a>
+          <button class="btn btn-danger btn-sm" onclick="deleteCustomer(${c.id})">🗑️</button>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+function deleteCustomer(id){
+  if(!confirm('Customer delete karein?')) return;
+  DB.customers=DB.customers.filter(c=>c.id!==id);
+  saveDB(); renderCustomers(); renderDash();
+  showToast('Customer delete ho gaya');
+}
+
+function openOrderFor(custId){
+  openModal('modal-order');
+  setTimeout(()=>document.getElementById('o-cust').value=custId,100);
+}
+function openPaymentFor(custId){
+  openModal('modal-payment');
+  setTimeout(()=>document.getElementById('p-cust').value=custId,100);
+}
+
+// ===== ORDERS =====
+function addOrder(){
+  const custId=parseInt(document.getElementById('o-cust').value);
+  const amt=parseInt(document.getElementById('o-amt').value);
+  if(!custId){ showToast('⚠️ Customer select karein!'); return; }
+  if(!amt){ showToast('⚠️ Amount dalein!'); return; }
+
+  DB.orders.push({
+    id:Date.now(), custId,
+    type:document.getElementById('o-type').value,
+    qty:parseInt(document.getElementById('o-qty').value)||1,
+    amount:amt,
+    date:document.getElementById('o-date').value||today(),
+    note:document.getElementById('o-note').value.trim(),
+    status:'Pending'
+  });
+  saveDB();
+  closeModal('modal-order');
+  ['o-note','o-amt'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('o-qty').value=1;
+  document.getElementById('o-cust').value='';
+  showToast('✅ Order add ho gaya!');
+  renderOrders(); renderKitchen(); renderDash();
+}
+
+function renderOrders(search=''){
+  const el=document.getElementById('page-orders');
+  let orders=[...DB.orders].reverse().filter(o=>{
+    const c=DB.customers.find(x=>x.id===o.custId);
+    return !search||(c&&c.name.toLowerCase().includes(search.toLowerCase()));
+  });
+
+  const statusColors={Pending:'p-yellow',Preparing:'p-blue','On the Way':'p-orange',Delivered:'p-green',Cancelled:'p-red'};
+  el.innerHTML=`
+    <button class="btn btn-primary btn-full" style="margin-bottom:12px" onclick="openModal('modal-order')">➕ New Order</button>
+    <input class="search-box" type="text" placeholder="🔍 Order search karein..." oninput="renderOrders(this.value)" value="${search}">
+    ${!orders.length?'<div class="empty"><div class="ei">📦</div>Koi order nahi</div>':
+    orders.map(o=>{
+      const c=DB.customers.find(x=>x.id===o.custId);
+      return `<div class="order-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:700;font-size:14px">${c?c.name:'Unknown'}</div>
+          <span class="pill ${statusColors[o.status]||'p-yellow'}">${o.status}</span>
+        </div>
+        <div style="font-size:12px;color:#888;margin-bottom:8px">${fmtDate(o.date)} • ${o.type} • Qty: ${o.qty} • <b>₹${o.amount}</b></div>
+        ${o.note?`<div style="font-size:12px;color:#888;margin-bottom:8px">📝 ${o.note}</div>`:''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${o.status!=='Delivered'&&o.status!=='Cancelled'?`
+            <button class="btn btn-success btn-sm" onclick="updateStatus(${o.id},'Delivered')">✅ Delivered</button>
+            <button class="btn btn-secondary btn-sm" onclick="updateStatus(${o.id},'Preparing')">👨‍🍳 Preparing</button>
+            <button class="btn btn-danger btn-sm" onclick="updateStatus(${o.id},'Cancelled')">❌ Cancel</button>
+          `:''}
+          <button class="btn btn-danger btn-sm" onclick="deleteOrder(${o.id})">🗑️</button>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+function updateStatus(id,status){
+  const o=DB.orders.find(x=>x.id===id);
+  if(o){ o.status=status; saveDB(); }
+  renderOrders(); renderKitchen(); renderDash();
+  showToast('✅ Status update ho gaya!');
+}
+
+function deleteOrder(id){
+  if(!confirm('Order delete karein?')) return;
+  DB.orders=DB.orders.filter(o=>o.id!==id);
+  saveDB(); renderOrders(); renderKitchen(); renderDash();
+}
+
+// ===== KITCHEN =====
+function renderKitchen(){
+  const el=document.getElementById('page-kitchen');
+  const tod=today();
+  const todOrds=DB.orders.filter(o=>o.date===tod);
+  const pending=todOrds.filter(o=>o.status==='Pending').length;
+  const preparing=todOrds.filter(o=>o.status==='Preparing').length;
+  const otw=todOrds.filter(o=>o.status==='On the Way').length;
+  const done=todOrds.filter(o=>o.status==='Delivered').length;
+  const cancelled=todOrds.filter(o=>o.status==='Cancelled').length;
+
+  const statusColors={Pending:'p-yellow',Preparing:'p-blue','On the Way':'p-orange',Delivered:'p-green',Cancelled:'p-red'};
+
+  el.innerHTML=`
+    <div class="banner" style="margin-bottom:14px">
+      <div>
+        <div class="banner-title">👨‍🍳 Kitchen</div>
+        <div class="banner-sub">Aaj ka status</div>
+      </div>
+      <button onclick="openModal('modal-order')" style="background:rgba(255,255,255,.25);border:none;border-radius:10px;padding:9px 14px;color:#fff;font-family:Poppins,sans-serif;font-weight:700;font-size:13px;cursor:pointer">➕ Order</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px">
+      <div class="stat-card" style="padding:10px"><div style="font-size:18px">📦</div><div class="stat-val" style="font-size:20px">${pending}</div><div class="stat-lbl" style="font-size:9px">Pending</div></div>
+      <div class="stat-card" style="padding:10px"><div style="font-size:18px">👨‍🍳</div><div class="stat-val" style="font-size:20px">${preparing}</div><div class="stat-lbl" style="font-size:9px">Preparing</div></div>
+      <div class="stat-card" style="padding:10px"><div style="font-size:18px">🛵</div><div class="stat-val" style="font-size:20px">${otw}</div><div class="stat-lbl" style="font-size:9px">On Way</div></div>
+      <div class="stat-card" style="padding:10px;border:2px solid #E8F8EE"><div style="font-size:18px">✅</div><div class="stat-val" style="font-size:20px;color:var(--green)">${done}</div><div class="stat-lbl" style="font-size:9px">Done</div></div>
+      <div class="stat-card" style="padding:10px;border:2px solid #FDEDEC"><div style="font-size:18px">❌</div><div class="stat-val" style="font-size:20px;color:var(--red)">${cancelled}</div><div class="stat-lbl" style="font-size:9px">Cancel</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Aaj ke Orders</div>
+      ${!todOrds.length?'<div class="empty"><div class="ei">📦</div>Aaj koi order nahi</div>':
+      todOrds.map(o=>{
+        const c=DB.customers.find(x=>x.id===o.custId);
+        return `<div style="background:#F9F9F9;border-radius:12px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:700">${c?c.name:'Unknown'}</div>
+            <span class="pill ${statusColors[o.status]||'p-yellow'}">${o.status}</span>
+          </div>
+          ${c&&c.address?`<div style="font-size:11px;color:#888;margin-bottom:8px">📍 ${c.address}</div>`:''}
+          <div style="font-size:12px;color:#888;margin-bottom:10px">${o.type} • Qty: ${o.qty} • ₹${o.amount}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${o.status==='Pending'?`<button class="btn btn-blue btn-sm" onclick="updateStatus(${o.id},'Preparing')">👨‍🍳 Start</button>`:''}
+            ${o.status==='Preparing'?`<button class="btn btn-primary btn-sm" onclick="updateStatus(${o.id},'On the Way')">🛵 Send</button>`:''}
+            ${o.status==='On the Way'?`<button class="btn btn-success btn-sm" onclick="updateStatus(${o.id},'Delivered')">✅ Delivered</button>`:''}
+            ${o.status!=='Delivered'&&o.status!=='Cancelled'?`<button class="btn btn-danger btn-sm" onclick="updateStatus(${o.id},'Cancelled')">❌ Cancel</button>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ===== PAYMENTS =====
+function addPayment(){
+  const custId=parseInt(document.getElementById('p-cust').value);
+  const amt=parseInt(document.getElementById('p-amt').value);
+  if(!custId){ showToast('⚠️ Customer select karein!'); return; }
+  if(!amt){ showToast('⚠️ Amount dalein!'); return; }
+
+  DB.payments.push({
+    id:Date.now(), custId, amount:amt,
+    date:document.getElementById('p-date').value||today(),
+    mode:document.getElementById('p-mode').value
+  });
+  saveDB();
+  closeModal('modal-payment');
+  document.getElementById('p-amt').value='';
+  showToast('✅ Payment save ho gaya!');
+  renderDash(); renderCustomers();
+}
+
+// ===== EXPENSES =====
+function addExpense(){
+  const amt=parseInt(document.getElementById('exp-amt').value);
+  if(!amt){ showToast('⚠️ Amount dalein!'); return; }
+  DB.expenses.push({
+    id:Date.now(),
+    type:document.getElementById('exp-type').value,
+    amount:amt,
+    date:document.getElementById('exp-date').value||today(),
+    note:document.getElementById('exp-note').value.trim()
+  });
+  saveDB();
+  closeModal('modal-expense');
+  document.getElementById('exp-amt').value='';
+  document.getElementById('exp-note').value='';
+  showToast('✅ Expense add ho gaya!');
+  renderReports();
+}
+
+// ===== REPORTS =====
+function renderReports(){
+  const el=document.getElementById('page-reports');
+  const now=new Date();
+  const m=now.getMonth(), y=now.getFullYear();
+
+  const income=DB.payments.filter(p=>{const d=new Date(p.date);return d.getMonth()===m&&d.getFullYear()===y;}).reduce((s,p)=>s+p.amount,0);
+  const expense=DB.expenses.filter(e=>{const d=new Date(e.date);return d.getMonth()===m&&d.getFullYear()===y;}).reduce((s,e)=>s+e.amount,0);
+  const profit=income-expense;
+
+  const monthName=now.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+
+  el.innerHTML=`
+    <div class="banner" style="margin-bottom:14px">
+      <div>
+        <div class="banner-title">📊 Reports</div>
+        <div class="banner-sub">${monthName}</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="stat-card" style="border:2px solid #E8F8EE">
+        <div style="font-size:20px">💰</div>
+        <div class="stat-val" style="font-size:18px;color:var(--green)">₹${income}</div>
+        <div class="stat-lbl">Income</div>
+      </div>
+      <div class="stat-card" style="border:2px solid #FDEDEC">
+        <div style="font-size:20px">📤</div>
+        <div class="stat-val" style="font-size:18px;color:var(--red)">₹${expense}</div>
+        <div class="stat-lbl">Expense</div>
+      </div>
+      <div class="stat-card" style="border:2px solid #FFF0E6">
+        <div style="font-size:20px">📈</div>
+        <div class="stat-val" style="font-size:18px;color:${profit>=0?'var(--green)':'var(--red)'}">₹${profit}</div>
+        <div class="stat-lbl">Profit</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-full" style="margin-bottom:14px" onclick="openModal('modal-expense')">➕ Expense Add Karein</button>
+
+    <div class="card">
+      <div class="card-title">📋 Recent Expenses</div>
+      ${!DB.expenses.length?'<div class="empty"><div class="ei">📊</div>Koi expense nahi</div>':
+      [...DB.expenses].reverse().slice(0,20).map(e=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F8F8F8">
+          <div>
+            <div style="font-weight:600;font-size:13px">${e.type}</div>
+            <div style="font-size:11px;color:#888">${fmtDate(e.date)}${e.note?' • '+e.note:''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font-weight:700;color:var(--red)">₹${e.amount}</div>
+            <button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})">🗑️</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-title">💳 Recent Payments</div>
+      ${!DB.payments.length?'<div class="empty"><div class="ei">💰</div>Koi payment nahi</div>':
+      [...DB.payments].reverse().slice(0,20).map(p=>{
+        const c=DB.customers.find(x=>x.id===p.custId);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F8F8F8">
+          <div>
+            <div style="font-weight:600;font-size:13px">${c?c.name:'Unknown'}</div>
+            <div style="font-size:11px;color:#888">${fmtDate(p.date)} • ${p.mode}</div>
+          </div>
+          <div style="font-weight:700;color:var(--green)">₹${p.amount}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function deleteExpense(id){
+  DB.expenses=DB.expenses.filter(e=>e.id!==id);
+  saveDB(); renderReports();
+}
+
+// ===== DASHBOARD =====
+function renderDash(){
+  const el=document.getElementById('page-dash');
+  const tod=today();
+  const todOrds=DB.orders.filter(o=>o.date===tod);
+  const m=new Date().getMonth(), y=new Date().getFullYear();
+  const monthIncome=DB.payments.filter(p=>{const d=new Date(p.date);return d.getMonth()===m&&d.getFullYear()===y;}).reduce((s,p)=>s+p.amount,0);
+  const dueCusts=DB.customers.filter(c=>calcDue(c.id)>0);
+  const pending=todOrds.filter(o=>o.status==='Pending'||o.status==='Preparing'||o.status==='On the Way').length;
+  const delivered=todOrds.filter(o=>o.status==='Delivered').length;
+
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+
+  const statusColors={Pending:'p-yellow',Preparing:'p-blue','On the Way':'p-orange',Delivered:'p-green',Cancelled:'p-red'};
+
+  el.innerHTML=`
+    <div class="banner">
+      <div>
+        <div class="banner-title">🍱 Asan Tiffin</div>
+        <div class="banner-sub">Asan Ghar Ka Khana</div>
+      </div>
+      <div class="banner-badge">${dateStr}</div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div style="font-size:28px">📦</div><div class="stat-val">${todOrds.length}</div><div class="stat-lbl">Aaj ke Orders</div></div>
+      <div class="stat-card"><div style="font-size:28px">👥</div><div class="stat-val">${DB.customers.length}</div><div class="stat-lbl">Customers</div></div>
+      <div class="stat-card"><div style="font-size:28px">💰</div><div class="stat-val" style="font-size:20px">₹${monthIncome}</div><div class="stat-lbl">Is Mahine</div></div>
+      <div class="stat-card"><div style="font-size:28px">🛵</div><div class="stat-val">${pending}</div><div class="stat-lbl">Delivery Baaki</div></div>
+      <div class="stat-card" style="border:2px solid #FDEDEC"><div style="font-size:28px">⏳</div><div class="stat-val" style="color:var(--red)">${dueCusts.length}</div><div class="stat-lbl">Payment Due</div></div>
+      <div class="stat-card" style="border:2px solid #E8F8EE"><div style="font-size:28px">✅</div><div class="stat-val" style="color:var(--green)">${delivered}</div><div class="stat-lbl">Delivered</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚡ Quick Actions</div>
+      <div class="qa-grid">
+        <button class="qa-btn" style="background:linear-gradient(135deg,var(--saffron),var(--turmeric));color:#fff" onclick="openModal('modal-order')"><span class="ic">➕</span>New Order</button>
+        <button class="qa-btn" style="background:linear-gradient(135deg,var(--leaf),var(--mint));color:#fff" onclick="openModal('modal-customer')"><span class="ic">👤</span>Add Customer</button>
+        <button class="qa-btn" style="background:linear-gradient(135deg,var(--gold),#E67E22);color:#fff" onclick="openModal('modal-payment')"><span class="ic">💵</span>Add Payment</button>
+        <button class="qa-btn" style="background:linear-gradient(135deg,var(--blue),#1A5276);color:#fff" onclick="showPage('kitchen')"><span class="ic">👨‍🍳</span>Kitchen</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-header">
+        <div class="sec-title">📋 Aaj ke Orders</div>
+        <button class="btn btn-secondary btn-sm" onclick="showPage('orders')">Sab dekho</button>
+      </div>
+      ${!todOrds.length?'<div class="empty"><div class="ei">📦</div>Aaj koi order nahi</div>':
+      todOrds.slice(0,5).map(o=>{
+        const c=DB.customers.find(x=>x.id===o.custId);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F8F8F8">
+          <div>
+            <div style="font-weight:600;font-size:13px">${c?c.name:'Unknown'}</div>
+            <div style="font-size:11px;color:#888">${o.type} • ₹${o.amount}</div>
+          </div>
+          <span class="pill ${statusColors[o.status]||'p-yellow'}">${o.status}</span>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${dueCusts.length?`<div class="card">
+      <div class="sec-header">
+        <div class="sec-title">⏳ Payment Due</div>
+      </div>
+      ${dueCusts.map(c=>{
+        const due=calcDue(c.id);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F8F8F8">
+          <div>
+            <div style="font-weight:600;font-size:13px">${c.name}</div>
+            <div style="font-size:11px;color:#888">${c.phone}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font-weight:700;color:var(--red)">₹${due}</div>
+            <button class="btn btn-success btn-sm" onclick="openPaymentFor(${c.id})">💵</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`:''}
+  `;
+}
+
+// ===== INIT =====
+function init(){
+  const now=new Date();
+  document.getElementById('pg-date').textContent=now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('c-start').value=today();
+  renderDash();
+}
+init();
+</script>
+</body>
+</html>
